@@ -1,0 +1,16 @@
+[package]
+name = "shellcode"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[profile.dev]
+panic = "abort"
+opt-level = "z"
+lto = true
+
+[profile.release]
+panic = "abort"
+opt-level = "z"
+lto = true

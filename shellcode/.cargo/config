@@ -1,0 +1,21 @@
+[build]
+target = "x86_64-pc-windows-msvc"
+
+rustflags = [
+    # pre-link
+    "-Z", "pre-link-arg=/NODEFAULTLIB", # not to use the default libraries
+    "--emit", "asm", # instructs the compiler to emit assembly code in addition to binary
+
+    # post-link
+    "-C", "link-arg=/ENTRY:main",
+    "-C", "link-arg=/MERGE:.edata=.rdata",
+    "-C", "link-arg=/MERGE:.rustc=.data",
+    "-C", "link-arg=/MERGE:.rdata=.text",
+    "-C", "link-arg=/MERGE:.pdata=.text",
+    "-C", "link-arg=/DEBUG:NONE", # disables generation of debug information
+    "-C", "link-arg=/EMITPOGOPHASEINFO", # generates phase information for profile-guided optimisation
+    "-C", "target-feature=-mmx,-sse,+soft-float" # disable mmx and sse
+]
+
+[unstable]
+build-std = ["core", "alloc"]
