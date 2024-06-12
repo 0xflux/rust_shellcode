@@ -2,7 +2,7 @@
 #![allow(non_camel_case_types)]
 #![allow(dead_code)]
 
-use core::{arch::asm, ffi::c_void, ops::Add, slice::from_raw_parts, str::{from_utf8, from_utf8_mut}};
+use core::{arch::asm, ffi::c_void, ops::Add, str::{from_utf8, from_utf8_mut}};
 
 /// A structure containing the module name, function name, and export address for each function loaded
 /// into the portable executable on x64 systems only.
@@ -48,19 +48,24 @@ fn get_module_base(module_name: &[u8]) -> Option<usize> {
             let dll_base = *(current_entry.add(0x30) as *const usize);
             let module_name_address = *(current_entry.add(0x60) as *const usize);
             let module_length = *(current_entry.add(0x58) as *const u16);
-            
+
             // check if the module name address is valid and not zero
             if module_name_address != 0 && module_length > 0 {
                 // read the module name from memory
-                let dll_name_slice = from_raw_parts(module_name_address as *const u16, (module_length / 2) as usize);
                 let mut buffer = [0u8; 512];
-                if let Some(dll_name) = wide_to_str(dll_name_slice, &mut buffer) {
-                    // do we have a match on the module name?
-                    if dll_name.eq_ignore_ascii_case(module_name) {
-                        return Some(dll_base);
+                let dll_name = unsafe {
+                    let mut len = 0;
+                    while len < (module_length / 2) as usize && (module_name_address as *const u16).add(len).read() != 0 {
+                        buffer[len] = (module_name_address as *const u16).add(len).read() as u8;
+                        len += 1;
                     }
-                }
+                    from_utf8(&buffer[..len]).unwrap_or("")
+                };
 
+                // do we have a match on the module name?
+                if dll_name.eq_ignore_ascii_case(module_name) {
+                    return Some(dll_base);
+                }
             } else {
                 return None;
             }
@@ -142,18 +147,16 @@ pub fn get_function_from_exports<'a>(dll_name: &'a [u8], needle: &'a [u8]) -> Op
         let name_addr = unsafe { dll_base.add(name_rva) };
         
         // read the function name
-        let function_name = unsafe {
-            let char = name_addr as *const u8;
-            let mut len = 0;
-            // iterate over the memory until a null terminator is found
-            while *char.add(len) != 0 {
+        let mut function_name = [0u8; 256];
+        let mut len = 0;
+        unsafe {
+            while len < function_name.len() && (name_addr.add(len) as *const u8).read() != 0 {
+                function_name[len] = (name_addr.add(len) as *const u8).read();
                 len += 1;
             }
+        }
 
-            from_raw_parts(char, len)
-        };
-
-        let function_name = from_utf8(function_name).unwrap_or("Invalid UTF-8");
+        let function_name = from_utf8(&function_name[..len]).unwrap_or("Invalid UTF-8");
         if function_name.eq("Invalid UTF-8") {
             return None;
         }
