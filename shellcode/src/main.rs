@@ -40,8 +40,8 @@ pub extern "C" fn main() {
     }
 
     // stack strings
-    let kernel32_dll = "fff.DLL\0";
-    let load_library_a = "lllll\0";
+    let kernel32_dll = "Kernel32.DLL\0";
+    let load_library_a = "LoadLibraryA\0";
 
     // get virtual addresses   
     let load_library_a_result = get_function_from_exports(kernel32_dll, load_library_a);
@@ -88,7 +88,7 @@ use core::{ops::Add, str::{from_utf8, from_utf8_mut}};
 /// Returns the DLL base address as a Option<usize> 
 #[allow(unused_variables)]
 #[allow(unused_assignments)]
-fn get_module_base(module_name: &str) -> Option<usize> {
+pub extern "system" fn get_module_base(module_name: &str) -> Option<usize> {
 
     // let module_name: &str = from_utf8(module_name).unwrap();
 
@@ -159,7 +159,7 @@ fn get_module_base(module_name: &str) -> Option<usize> {
 /// 
 /// # Returns
 /// Option<*const c_void> -> the function address as a pointer
-pub fn get_function_from_exports(dll_name: &str, needle: &str) -> Option<usize> {
+pub extern "system" fn get_function_from_exports(dll_name: &str, needle: &str) -> Option<usize> {
 
     let dll_name = dll_name.trim_end_matches('\u{0}');
     let needle = needle.trim_end_matches('\u{0}');
