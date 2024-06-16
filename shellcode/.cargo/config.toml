@@ -1,0 +1,19 @@
+[build]
+target = "x86_64-pc-windows-msvc"
+
+rustflags = [
+    "-Z", "pre-link-arg=/NODEFAULTLIB", # no default libs
+    "--emit", "asm", # for generating asm
+
+    "-C", "link-arg=/ENTRY:main", # direct entrypoint to main
+
+    # reduce size and complexity
+    "-C", "link-arg=/MERGE:.edata=.rdata",
+    "-C", "link-arg=/MERGE:.rustc=.data",
+    "-C", "link-arg=/MERGE:.rdata=.text",
+    "-C", "link-arg=/MERGE:.pdata=.text",
+
+    "-C", "link-arg=/DEBUG:NONE", # no symbols
+    "-C", "link-arg=/EMITPOGOPHASEINFO",
+    "-C", "target-feature=-mmx,-sse,+soft-float", # no special cpu / hardware requirements
+]

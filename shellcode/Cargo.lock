@@ -3,5 +3,5 @@
 version = 3
 
 [[package]]
-name = "shellcode"
+name = "rust_simple_shellcode"
 version = "0.1.0"
