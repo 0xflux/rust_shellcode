@@ -58,7 +58,7 @@ pub extern "system" fn get_function_from_exports(dll_base: *const c_void, needle
         // cast the dos header
         let dos_header = &*(dll_base as *const IMAGE_DOS_HEADER);
         if (*dos_header).e_magic != IMAGE_DOS_SIGNATURE {
-            return 0x12345678 as *const c_void;
+            return 0x87654321 as *const c_void;
         }
 
         // get us to the export directory
@@ -76,14 +76,14 @@ pub extern "system" fn get_function_from_exports(dll_base: *const c_void, needle
 
         // iterate through each export, looking for our chosen
         for i in 0..number_of_names {
-            let name_rva_p: *const DWORD = (dll_base as *const u8).offset((addr_of_names + i * 4) as isize) as *const _;
-            let name_index_p: *const WORD = (dll_base as *const u8).offset((addr_of_ords + i * 2) as isize) as *const _;
-            let name_index = name_index_p.as_ref().unwrap();
-            let mut off: u32 = (4 * name_index) as u32;
-            off = off + addr_of_funcs;
-            let func_rva: *const DWORD = (dll_base as *const u8).offset(off as _) as *const _;
+            let p_name_rva: *const DWORD = (dll_base as *const u8).offset((addr_of_names + i * 4) as isize) as *const _;
+            let p_name_index: *const WORD = (dll_base as *const u8).offset((addr_of_ords + i * 2) as isize) as *const _;
+            let name_index = p_name_index.as_ref().unwrap();
+            let mut offset: u32 = (4 * name_index) as u32;
+            offset = offset + addr_of_funcs;
+            let func_rva: *const DWORD = (dll_base as *const u8).offset(offset as _) as *const _;
 
-            let name_rva = name_rva_p.as_ref().unwrap();
+            let name_rva = p_name_rva.as_ref().unwrap();
             let curr_name = (dll_base as *const u8).offset(*name_rva as isize);
 
             if *curr_name == 0 {
