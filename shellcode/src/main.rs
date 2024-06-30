@@ -15,7 +15,7 @@ fn panic(_info: &PanicInfo) -> ! {
 pub type WinExec = extern "system" fn(lpCmdLine: LPCSTR, uCmdShow: u32) -> u32;
 
 #[no_mangle]
-pub extern "system" fn main() -> ! {
+pub extern "system" fn main() {
     
     unsafe {
         // clean argc and argv
@@ -56,14 +56,4 @@ pub extern "system" fn main() -> ! {
 
     let WinExec: WinExec = unsafe { transmute(win_exec_fn_addr) };
     WinExec("calc.exe\0" as *const _ as *const i8, 1);
-
-    // black_box(b, load_library_a_addr);
-
-    loop{}
-}
-
-#[inline(never)]
-extern "system" fn black_box<T, C>(dummy: T, dummy_b: C) -> C {
-    unsafe { core::ptr::read_volatile(&dummy) };
-    unsafe { core::ptr::read_volatile(&dummy_b) }
 }

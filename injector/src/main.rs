@@ -72,15 +72,15 @@ fn main() {
 
 
         // ####################################################
-        // CREATE REMOTE THREAD
+        // INJECT VIA CREATE REMOTE THREAD
         
-        let result_createremotethread = CreateRemoteThread(h_process, 
-            None, 0, transmute(remotememory_ptr), None, 0, None);
+        // let result_createremotethread = CreateRemoteThread(h_process, 
+        //     None, 0, transmute(remotememory_ptr), None, 0, None);
 
-        match result_createremotethread {
-            Ok(_) => println!("[+] Thread created"),
-            Err(e) => eprintln!("[-] Error creating thread {e}"),
-        }
+        // match result_createremotethread {
+        //     Ok(_) => println!("[+] Thread created"),
+        //     Err(e) => eprintln!("[-] Error creating thread {e}"),
+        // }
     }
 }
 
