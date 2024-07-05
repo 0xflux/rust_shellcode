@@ -104,6 +104,11 @@ pub extern "system" fn main() {
         return;
     }
 
-    let WinExec: WinExec = unsafe { transmute(win_exec_fn_addr) };
-    WinExec("calc.exe\0" as *const _ as *const i8, 1);
+    // let WinExec: WinExec = unsafe { transmute(win_exec_fn_addr) };
+    // WinExec("calc.exe\0" as *const _ as *const i8, 1);
+
+    // TODO - maybe download a bin of other shellcode which does something different
+    // then inject that into this process?)
+    // or download a DLL and just use LoadLibraryA on the current process (i.e. no more injection)
+    // that might be easiest :)
 }
