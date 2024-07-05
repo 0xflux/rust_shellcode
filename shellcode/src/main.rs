@@ -96,7 +96,7 @@ pub extern "system" fn main() {
     // URLDownloadToFile
     let URLDownloadToFile: URLDownloadToFile = unsafe { transmute(URLDownloadToFileFnAddr) };
     let url = "https://fluxsec.red/sitemap.xml\0";
-    let file_name = "C:\\Users\\ian\\git\\rust_shellcode\\shellcode\\test_file.xml\0";
+    let file_name = "C:\\Users\\ian\\git\\rust_shellcode\\shellcode\\test_file_2.xml\0";
     
     let result = URLDownloadToFile(null_mut(), url.as_ptr() as *const i8, file_name.as_ptr() as *const i8, 0, null_mut());
     if result != 0 {
